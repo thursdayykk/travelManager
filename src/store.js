@@ -1,9 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 Vue.use(Vuex)
-
-
-// console.log(window.localStorage.getItem('username'))
 export default new Vuex.Store({
     state: {
         curUser: {
@@ -11,7 +8,6 @@ export default new Vuex.Store({
             username:window.sessionStorage.getItem('username'),
             pic: window.sessionStorage.getItem('pic')
         }
-
     },
     getters: {
         GET_USER(state) {
@@ -19,7 +15,8 @@ export default new Vuex.Store({
         }
     },
     mutations: {
-        SET_USER(state, obj) {     
+        SET_USER(state, obj) {
+            console.log(obj)     
             state.curUser = {
                 pic: obj.pic || null,
                 username: obj.username,

@@ -28,7 +28,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="money" label="价格" width="80"></el-table-column>
-          <el-table-column prop="grade" label="评分" width="80"></el-table-column>
+          <!-- <el-table-column prop="grade" label="评分" width="80"></el-table-column> -->
           <el-table-column fixed="right" label="操作" width="90">
             <template slot-scope="scope">
               <el-button
@@ -159,13 +159,6 @@
                   <el-col :span="2" :offset="20">
                     <el-button type="primary" @click="addChildren" :disabled="disabled">添加</el-button>
                   </el-col>
-                  <!-- <el-col :span="2">
-                    <el-button
-                      type="danger"
-                      @click="deleteChildren"
-                      :disabled="disabled || !(this.multipleSelection.length > 0)"
-                    >删除</el-button>
-                  </el-col>-->
                 </el-row>
                 <el-table :data="childrenList" stripe style="width: 100%">
                   <el-table-column prop="title" label="房间类型" width="180">
@@ -207,24 +200,19 @@
                 </el-table>
               </el-tab-pane>
               <el-tab-pane label="评论管理" name="second">
-                <el-row>
-                  <el-col :span="2" :offset="22">
-                    <el-button
-                      type="danger"
-                      @click="deleteComment"
-                      :disabled="!(this.multipleSelection2.length > 0)"
-                    >删除</el-button>
-                  </el-col>
-                </el-row>
                 <el-table
                   :data="commentList"
                   stripe
                   style="width: 100%"
                   @selection-change="handleSelectionChange2"
                 >
-                  <el-table-column type="selection" width="55"></el-table-column>
+                  <!-- <el-table-column type="selection" width="55"></el-table-column> -->
                   <el-table-column prop="username" label="用户名" width="180"></el-table-column>
-                  <el-table-column prop="content" label="内容" width="450"></el-table-column>
+                  <el-table-column prop="content" label="内容" width="450">
+                    <template slot-scope="scope">
+                      <span>{{scope.row.content.length > 50 ?scope.row.content.substring(0,50)+'....':scope.row.content}}</span>
+                    </template>
+                  </el-table-column>
                   <el-table-column prop="ctime" label="发布时间">
                     <template slot-scope="scope">
                       <span>{{imeFormatter(scope.row.ctime)}}</span>
@@ -311,7 +299,7 @@ export default {
       loading: false,
       showOpera: true,
       currentPage: 1,
-      totalData: 10,
+      totalData: 2,
       device: [],
       deviceInp: "",
       tableData: [],
@@ -348,13 +336,13 @@ export default {
       ruleForm: {
         typeId:"",
         userId: "",
-        name: "金泉港IMAX国际影城",
-        area: "6",
+        name: "",
+        area: "",
         pic: "",
-        content: "哈哈哈哈哈哈",
-        money: "198",
-        address: "朝阳区大屯里金泉购物中心318号楼4层",
-        phone: "12855-25654161",
+        content: "",
+        money: "",
+        address: "",
+        phone: "",
         device: ""
       },
       rules: {
@@ -394,16 +382,9 @@ export default {
           this.$message.error("获取酒店失败！");
         });
     },
-    // getChildrenList() {
-    //   this.childrenList = []
-    //   this.$axios
-    //     .get("/getRoomByHotelId?hotelId=" + this.ruleForm.id)
-    //     .then(res => {})
-    //     .catch(res => {});
-    // },
+   
     getComment() {
       this.commentList = [];
-      // console.log(this.commentPage, this.commentPageSize);
       this.$axios
         .get(
           "/getCommentByHotelId?hotelId=" +
@@ -504,7 +485,34 @@ export default {
     },
 
     deleteRow(index, rows) {
-      rows.splice(index, 1);
+       this.$confirm("此操作将永久删除, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$axios
+            .get("/deleteHotel?id=" + rows[index].id)
+            .then(res => {
+              rows.splice(index, 1);
+              this.$message({
+                type: "success",
+                message: "删除成功!"
+              });
+            })
+            .catch(() => {
+              this.$message({
+                type: "info",
+                message: "已取消删除"
+              });
+            });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     },
     editRow(row) {
       let data = row;
@@ -596,9 +604,9 @@ export default {
       let addRoomList = [],
         updateRoomList = [];
       for (let i = 0; i < this.childrenList.length; i++) {
-        if (!this.childrenList[i].id) {
+        if (!this.childrenList[i].id) { //如果没有id说明需要添加
           addRoomList.push(this.childrenList[i]);
-        } else {
+        } else { //如果有id说明需要更新
           updateRoomList.push(this.childrenList[i]);
         }
       }
@@ -615,10 +623,8 @@ export default {
           typeId:this.ruleForm.typeId,
           introduction: this.ruleForm.content,
           device: this.ruleForm.device,
-          // deleteRoomId: this.deleteChildrenIdId,
-          addRoomList,
-          updateRoomList
-          // delelteCommentId: this.deleteCommentId
+          addRoomList, //添加房间列表
+          updateRoomList//更新房间列表
         })
         .then(res => {
           this.$message.success("操作成功！");
@@ -667,25 +673,6 @@ export default {
               el.idx = index;
             });
           }
-
-          // let len = this.multipleSelection.length;
-          // if (len > 0) {
-          //   // ADD,DELETE,UPDATE
-          //   var deleteId = [];
-          //   for (var i = 0; i < len; i++) {
-          //     //有id说明需要删除
-          //     if (this.multipleSelection[i].id) {
-          //       deleteId.push(parseInt(this.multipleSelection[i].id));
-          //       this.multipleSelection[i].id = null;
-          //       i--;
-          //     } else if (!this.multipleSelection[i].id) {
-          //       console.log(this.multipleSelection[i].idx);
-          //       this.childrenList.splice(this.multipleSelection[i].idx, 1);
-          //       this.childrenList.forEach((el, index) => {
-          //         el.idx = index;
-          //       });
-          //     }
-          //   }
 
           if (deleteId.length > 0) {
             this.$axios

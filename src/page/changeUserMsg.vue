@@ -113,6 +113,7 @@ export default {
         )
         .then(res => {
           if (res.data.data.length > 0) {
+            
             let data = res.data.data[0];
             this.ruleForm.id = data.id;
             this.ruleForm.userPic = data.pic;

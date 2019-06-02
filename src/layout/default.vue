@@ -22,7 +22,7 @@
                   <i class="el-icon-arrow-down el-icon--right"></i>
                 </span>
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item>登出</el-dropdown-item>
+                  <el-dropdown-item ><a @click="loginOut()">登出</a></el-dropdown-item>
                   <el-dropdown-item>
                     <router-link :to="{name:'userMsg'}" tag="li">修改个人资料</router-link>
                   </el-dropdown-item>
@@ -111,13 +111,13 @@ export default {
     return {
       breadcrumbList: [],
       pic:
-        window.localStorage.getItem("pic") == "null" &&
-        window.localStorage.getItem("pic")
+        window.sessionStorage.getItem("pic") == "null" &&
+        window.sessionStorage.getItem("pic")
           ? HEADPIC
-          : window.localStorage.getItem("pic")
+          : window.sessionStorage.getItem("pic")
     };
   },
-  watch:{
+  watch: {
     // pic(newVal,oldVal){
     //   // console.log(newVal,oldVal)
     // }
@@ -133,8 +133,8 @@ export default {
   },
   watch: {
     $route(to, from) {
-      console.log("to======", to);
-      console.log("from====", from);
+      // console.log("to======", to);
+      // console.log("from====", from);
       this.getBreadcrumb();
     }
   },
@@ -142,8 +142,8 @@ export default {
     this.getBreadcrumb();
   },
   created() {
-    console.log(typeof this.getUser.power, this.getUser.power);
-    console.log(window.localStorage.getItem("pic"));
+    // console.log(typeof this.getUser.power, this.getUser.power);
+    // console.log(window.localStorage.getItem("pic"));
   },
   methods: {
     getBreadcrumb() {
@@ -151,7 +151,10 @@ export default {
       this.breadcrumbList = matched;
     },
     loginOut() {
-      document.cookie = "name=admin;max-age=-1";
+      let root =this;
+      // console.log('111')
+      document.cookie = "name=" + root.getUser.username + ";max-age=" + -1;
+      document.cookie = "power=" + root.getUser.power + ";max-age=" + -1;
       this.$router.push({ name: "login" });
     },
     showUserMessage() {}

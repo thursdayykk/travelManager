@@ -10,13 +10,8 @@ import hotelCharge from '@/page/hotelCharge.vue'
 import blogCharge from '@/page/blogCharge.vue'
 import sceneryCharge from '@/page/sceneryCharge.vue'
 import userMsg from '@/page/changeUserMsg.vue'
-import detail from '@/page/detail.vue'
+
 import err from '@/page/404NOTFOUND.vue'
-import userDetail from '@/components/userDetail.vue'
-import blogDetail from '@/components/blogDetail.vue'
-import hotelDetail from '@/components/hotelDetail.vue'
-import sceneryDetail from '@/components/sceneryDetail.vue'
-import storeDetail from '@/components/storeDetail.vue'
 
 
 
@@ -33,12 +28,26 @@ let config = {
         path: '/userCharge',
         name: 'user',
         meta: { title: '用户管理' },
-        component: userCharge
+        component: userCharge,  
+        beforeEnter(to,form,next){
+          if(window.sessionStorage.getItem('power') == -1  ){
+            next()
+          }else{
+            next({name:'err'})
+          }
+        },
       }, {
         path: '/storeCharge',
         name: 'store',
         meta: { title: '美食管理' },
-        component: storeCharge
+        component: storeCharge,
+        beforeEnter(to,form,next){
+          if(window.sessionStorage.getItem('power') == -1 || window.sessionStorage.getItem('power') == 4 ){
+            next()
+          }else{
+            next({name:'err'})
+          }
+        },
       },{
         path: '/userMsg',
         name: 'userMsg',
@@ -48,49 +57,38 @@ let config = {
         path: '/blogCharge',
         name: 'blog',
         meta: { title: '攻略管理' },
-        component: blogCharge
+        component: blogCharge,
+        beforeEnter(to,form,next){
+          if(window.sessionStorage.getItem('power') == -1 || window.sessionStorage.getItem('power') == 3 ){
+            next()
+          }else{
+            next({name:'err'})
+          }
+        },
       }, {
         path: '/hotelCharge',
         name: 'hotel',
         meta: { title: '酒店管理' },
-        component: hotelCharge
+        component: hotelCharge,
+        beforeEnter(to,form,next){
+          if(window.sessionStorage.getItem('power') == -1 || window.sessionStorage.getItem('power') == 2 ){
+            next()
+          }else{
+            next({name:'err'})
+          }
+        },
       }, {
         path: '/sceneryCharge',
         name: 'scenery',
         meta: { title: '景区管理' },
-        component: sceneryCharge
-      }, {
-        path: '/detail',
-        name: 'detail',
-        meta: { title: '详情' },
-        component: detail,
-        children: [
-          {
-            path: '/userDetail/:id?',
-            name: 'userDetail',
-            component: userDetail
-          },
-          {
-            path: '/storeDetail/:id?',
-            name: 'storeDetail',
-            component: storeDetail
-          },
-          {
-            path: '/sceneryDetail/:id?',
-            name: 'sceneryDetail',
-            component: sceneryDetail
-          },
-          {
-            path: '/blogDetail/:id?',
-            name: 'blogDetail',
-            component: blogDetail
-          },
-          {
-            path: '/hotelDetail/:id?',
-            name: 'hotelDetail',
-            component: hotelDetail
+        component: sceneryCharge,
+        beforeEnter(to,form,next){
+          if(window.sessionStorage.getItem('power') == -1 || window.sessionStorage.getItem('power') == 1 ){
+            next()
+          }else{
+            next({name:'err'})
           }
-        ]
+        },
       }]
     },
     {
@@ -125,7 +123,7 @@ let router = new Router(config);
 router.beforeEach((to,from,next) =>{
   // console.log(to,from)
   //如果不执行next 路由不会发生跳转
-  console.log(to,from)
+  // console.log(to,from)
   // console.log(document.cookie)
   if(to.path == '/login' || to.path == '/register'){
     // console.log('hi')
